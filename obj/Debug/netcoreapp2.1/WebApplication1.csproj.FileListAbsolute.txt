@@ -1,0 +1,14 @@
+/home/abzal/RiderProjects/WebApplication1/bin/Debug/netcoreapp2.1/WebApplication1.deps.json
+/home/abzal/RiderProjects/WebApplication1/bin/Debug/netcoreapp2.1/WebApplication1.runtimeconfig.json
+/home/abzal/RiderProjects/WebApplication1/bin/Debug/netcoreapp2.1/WebApplication1.runtimeconfig.dev.json
+/home/abzal/RiderProjects/WebApplication1/bin/Debug/netcoreapp2.1/WebApplication1.dll
+/home/abzal/RiderProjects/WebApplication1/bin/Debug/netcoreapp2.1/WebApplication1.pdb
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.csprojAssemblyReference.cache
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.csproj.CoreCompileInputs.cache
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.RazorAssemblyInfo.cache
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.RazorAssemblyInfo.cs
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.AssemblyInfoInputs.cache
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.AssemblyInfo.cs
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.RazorTargetAssemblyInfo.cache
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.dll
+/home/abzal/RiderProjects/WebApplication1/obj/Debug/netcoreapp2.1/WebApplication1.pdb
