@@ -11,7 +11,7 @@ namespace WebApplication1.Models
         public long Id { get; set; }
         public String TaskName { get; set; }
         public String TaskDesription { get; set; }
-          [ForeignKey("TaskCategoryID")]
+        [ForeignKey("TaskCategoryID")]
         public long TaskCategoryID { get; set; }
         public TaskCategory TaskCategory { get; set; }
 

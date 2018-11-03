@@ -8,7 +8,7 @@ using WebApplication1.Models;
 
 namespace WebApplication1.Migrations
 {
-    [DbContext(typeof(UserContext))]
+    [DbContext(typeof(DataContext))]
     [Migration("20181020025224_2")]
     partial class _2
     {

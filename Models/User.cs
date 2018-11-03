@@ -11,6 +11,7 @@ namespace WebApplication1
         public long Id { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-        public virtual UserProfile profile { get; set; }
+        public byte[] PasswordEnc { get; set; }
+        public virtual UserProfile Profile { get; set; }
     }
 }

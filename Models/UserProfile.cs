@@ -12,6 +12,6 @@ namespace WebApplication1.Models
         public string Surname { get; set; }
         public int Role { get; set; }       //0 - admin, 1 - user
         public long UserRef { get; set; }
-        public virtual User user { get; set; }
+        public virtual User User { get; set; }
     }
 }

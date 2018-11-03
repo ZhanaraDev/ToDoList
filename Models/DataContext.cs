@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace WebApplication1.Models
 {
-    public class UserContext: DbContext
+    public class DataContext: DbContext
     {
-        public UserContext(DbContextOptions<UserContext> options) : base(options) { }
+
+        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<User> User { get; set; }
 
@@ -21,8 +22,8 @@ namespace WebApplication1.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
-            .HasOne(a => a.profile)
-            .WithOne(b => b.user)
+            .HasOne(a => a.Profile)
+            .WithOne(b => b.User)
             .HasForeignKey<UserProfile>(b => b.UserRef);
 
             modelBuilder.Entity<Task>()
