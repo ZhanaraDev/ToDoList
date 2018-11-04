@@ -13,5 +13,9 @@ namespace WebApplication1
         public string Password { get; set; }
         public byte[] PasswordEnc { get; set; }
         public virtual UserProfile Profile { get; set; }
+        public override string ToString()
+        {
+            return Id.ToString();
+        }
     }
 }

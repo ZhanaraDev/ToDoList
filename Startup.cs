@@ -17,6 +17,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebApplication1.Helpers;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace WebApplication1
 {
@@ -51,11 +55,17 @@ namespace WebApplication1
            .AddJwtBearer(x =>
            {
                x.Events = new JwtBearerEvents
-               {
+               {    
                    OnTokenValidated = context =>
                    {
+                       Trace.WriteLine("Some shitty witty");
                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                       var userId = int.Parse(context.Principal.Identity.Name);
+                       Trace.WriteLine("Some shitty witty1");
+                       Trace.WriteLine(context.Principal.Identity.Name.ToString());
+                       Trace.WriteLine("Some shitty witty2");
+                       Trace.WriteLine(context.Principal.Identity.IsAuthenticated);
+                       var userId = long.Parse(context.Principal.Identity.Name);
+                       Trace.WriteLine(userId);
                        var user = userService.GetById(userId);
                        if (user == null)
                        {
@@ -65,6 +75,7 @@ namespace WebApplication1
                        return System.Threading.Tasks.Task.CompletedTask;
                    }
                };
+               Trace.WriteLine("sonice");
                x.RequireHttpsMetadata = false;
                x.SaveToken = true;
                x.TokenValidationParameters = new TokenValidationParameters
@@ -91,8 +102,8 @@ namespace WebApplication1
                 app.UseHsts();
             }
 
-
-            app.UseHttpsRedirection();
+            app.UseAuthentication();
+           // app.UseHttpsRedirection();
             app.UseMvc();
         }
     }

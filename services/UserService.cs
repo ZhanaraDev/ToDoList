@@ -12,7 +12,7 @@ namespace WebApplication1.services
     public interface IUserService
     {
         User Create(User u, string password);
-        object GetById(int userId);
+        object GetById(long userId);
         object Authenticate(string userName, string password);
     }
     public class UserService : IUserService
@@ -65,7 +65,7 @@ namespace WebApplication1.services
             return sha1password;
         }
 
-        public object GetById(int id)
+        public object GetById(long id)
         {
             return _context.User.Find(id);
         }

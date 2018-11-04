@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using WebApplication1.dto;
+using WebApplication1.Helpers;
 using WebApplication1.services;
 
 namespace WebApplication1.Controllers
@@ -15,9 +21,11 @@ namespace WebApplication1.Controllers
     public class UsersController : ControllerBase
     {
         private IUserService _userService;
-        public UsersController(IUserService userService)
+        private readonly AppSettings _appSettings;
+        public UsersController(IUserService userService, IOptions<AppSettings> appSettings)
         {
             _userService = userService;
+            _appSettings = appSettings.Value;
         }
         
 
@@ -60,10 +68,26 @@ namespace WebApplication1.Controllers
         [Route("auth")]
         public IActionResult Authenticate([FromBody] RegistrationReq req)
         {
+            Trace.WriteLine("--auth--");
             var user = _userService.Authenticate(req.UserName, req.Password);
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
-            return Ok();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            return Ok(new {Token=tokenString,hi="ajdaisjdioasj"});
         }
 
         // PUT api/values/5
