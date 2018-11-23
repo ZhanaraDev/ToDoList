@@ -14,6 +14,11 @@ namespace WebApplication1.Models
         [ForeignKey("TaskCategoryID")]
         public long TaskCategoryID { get; set; }
         public TaskCategory TaskCategory { get; set; }
+        public DateTime DateAdded { get; set; }
+        public DateTime Deadline { get; set; }
+        public bool isImportant { get; set; }
+        public virtual ICollection<UserTasks> UserTasks { get; set; }
+
 
     }
 }

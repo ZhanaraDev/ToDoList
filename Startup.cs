@@ -88,6 +88,7 @@ namespace WebApplication1
            });
 
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUserProfileService, UserProfileService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

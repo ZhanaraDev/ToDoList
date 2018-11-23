@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.dto;
 using WebApplication1.Helpers;
+using WebApplication1.Models;
 using WebApplication1.services;
 
 namespace WebApplication1.Controllers
@@ -21,10 +22,12 @@ namespace WebApplication1.Controllers
     public class UsersController : ControllerBase
     {
         private IUserService _userService;
+        private IUserProfileService _userProfileService;
         private readonly AppSettings _appSettings;
-        public UsersController(IUserService userService, IOptions<AppSettings> appSettings)
+        public UsersController(IUserService userService, IUserProfileService userProfileService, IOptions<AppSettings> appSettings)
         {
             _userService = userService;
+            _userProfileService = userProfileService;
             _appSettings = appSettings.Value;
         }
         
@@ -33,7 +36,6 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            Console.WriteLine("lalalal");
             return new string[] { "value1", "value2" };
         }
 
@@ -56,6 +58,9 @@ namespace WebApplication1.Controllers
             try
             {
                 _userService.Create(u, req.Password);
+                UserProfile up = new UserProfile { User = u,Role=1 };//cuz its ordinary user
+                _userProfileService.Create(up);
+
                 return Ok();
             }
             catch(ApplicationException ex)
@@ -87,7 +92,7 @@ namespace WebApplication1.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new {Token=tokenString,hi="ajdaisjdioasj"});
+            return Ok(new {Token=tokenString});
         }
 
         // PUT api/values/5

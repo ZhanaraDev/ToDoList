@@ -11,8 +11,9 @@ namespace WebApplication1
         public long Id { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-        public byte[] PasswordEnc { get; set; }
         public virtual UserProfile Profile { get; set; }
+        public virtual ICollection<TaskCategory> TaskCategories { get; set; }
+        public virtual ICollection<UserTasks> UserTasks { get; set; }
         public override string ToString()
         {
             return Id.ToString();

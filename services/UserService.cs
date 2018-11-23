@@ -50,7 +50,6 @@ namespace WebApplication1.services
             var sha1password = encrypt_password(u.Password);
 
             u.Password = Convert.ToBase64String(sha1password);
-            u.PasswordEnc = sha1password;
             _context.User.Add(u);
             _context.SaveChanges();
             return u;

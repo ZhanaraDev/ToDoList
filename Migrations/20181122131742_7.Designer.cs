@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebApplication1.Models;
@@ -9,9 +10,10 @@ using WebApplication1.Models;
 namespace WebApplication1.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class UserContextModelSnapshot : ModelSnapshot
+    [Migration("20181122131742_7")]
+    partial class _7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,11 +54,7 @@ namespace WebApplication1.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<long?>("UserId");
-
                     b.HasKey("TaskCategoryID");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("TaskCategory");
                 });
@@ -115,13 +113,6 @@ namespace WebApplication1.Migrations
                         .WithMany("Tasks")
                         .HasForeignKey("TaskCategoryID")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.TaskCategory", b =>
-                {
-                    b.HasOne("WebApplication1.User", "User")
-                        .WithMany("TaskCategories")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("WebApplication1.Models.UserProfile", b =>
