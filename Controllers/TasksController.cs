@@ -13,10 +13,11 @@ using WebApplication1.Models;
 namespace WebApplication1.Controllers
 {   [Authorize]
     [Route("api/[controller]")]
-    public class CategoriesController : Controller
+    public class TasksController : Controller
     {
         private DataContext _context;
-        public CategoriesController(DataContext context)
+
+        public TasksController(DataContext context)
         {
             _context = context;
         }
@@ -24,10 +25,7 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public string Get()
         {
-            System.Diagnostics.Trace.WriteLine("GET ALL");
-            System.Diagnostics.Trace.WriteLine(_context.TaskCategory.ToList());
-            System.Diagnostics.Trace.WriteLine("GET ALL-DONE");
-            return JsonConvert.SerializeObject(_context.TaskCategory.ToList(),
+            return JsonConvert.SerializeObject(_context.Task.ToList(),
             new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -38,23 +36,28 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            TaskCategory cat = _context.TaskCategory.Find((long)id);
-            return JsonConvert.SerializeObject(cat);
+            Models.Task task = _context.Task.Find((long)id);
+            return JsonConvert.SerializeObject(task); 
         }
 
         // POST api/<controller>
         [HttpPost]
-        public IActionResult Post([FromBody]CategoriesDTO cat)
+        public IActionResult Post([FromBody]TaskDTO _task)
         {
-            TaskCategory tc = new TaskCategory {
-                CategoryName = cat.CategoryName,
-                Description = cat.Description,
-                User = _context.User.Find(long.Parse(User.Identity.Name))
+            System.Diagnostics.Trace.WriteLine("CREATE TASK");
+            System.Diagnostics.Trace.WriteLine(_task.isImportant);
+            Models.Task task = new Models.Task {
+                TaskName = _task.TaskName,
+                TaskDesription = _task.TaskDesription,
+                TaskCategory = _context.TaskCategory.Find(_task.CategoryID),
+                DateAdded = DateTime.Now,
+                isImportant = _task.isImportant,
+                Deadline = _task.Deadline
             };
+
             try
             {
-                System.Diagnostics.Trace.WriteLine("CREATE CATEGORY");
-                _context.TaskCategory.Add(tc);
+                _context.Task.Add(task);
                 _context.SaveChanges();
                 return Ok();
             }
@@ -74,9 +77,9 @@ namespace WebApplication1.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            TaskCategory cat = new TaskCategory { TaskCategoryID = id };
-            _context.TaskCategory.Attach(cat);
-            _context.TaskCategory.Remove(cat);
+            Models.Task task = new Models.Task { Id = id };
+            _context.Task.Attach(task);
+            _context.Task.Remove(task);
             _context.SaveChanges();
         }
     }
