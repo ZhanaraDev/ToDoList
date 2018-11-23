@@ -21,16 +21,16 @@ namespace WebApplication1.Controllers
         }
         // GET: api/<controller>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public List<TaskCategory> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _context.TaskCategory.ToList();
         }
 
         // GET api/<controller>/5
         [HttpGet("{id}")]
-        public string Get(int id)
-        { 
-            return "value";
+        public TaskCategory Get(int id)
+        {
+            return _context.TaskCategory.Find(id);
         }
 
         // POST api/<controller>

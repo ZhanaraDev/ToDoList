@@ -13,6 +13,7 @@ namespace WebApplication1.services
     {
         User Create(User u, string password);
         object GetById(long userId);
+        List<User> GetAll();
         object Authenticate(string userName, string password);
     }
     public class UserService : IUserService
@@ -22,6 +23,11 @@ namespace WebApplication1.services
         public UserService(DataContext context)
         {
             _context = context;
+        }
+
+        public List<User> GetAll()
+        {
+            return _context.User.ToList();
         }
 
         public object Authenticate(string userName, string password)

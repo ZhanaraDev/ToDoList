@@ -31,19 +31,17 @@ namespace WebApplication1.Controllers
             _appSettings = appSettings.Value;
         }
         
-
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public User Get(long id)
         {
-            return "value";
+           return (User) _userService.GetById(id);
+        }
+        
+        [HttpGet()]
+        public List<User> GetAll(long id)
+        {
+            return  _userService.GetAll();
         }
 
         // POST api/values
