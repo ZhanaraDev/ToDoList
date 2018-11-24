@@ -18,6 +18,7 @@ namespace WebApplication1.Models
         public DbSet<Task> Task { get; set; }
 
         public DbSet<TaskCategory> TaskCategory { get; set; }
+        public DbSet<UserTasks> UserTasks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

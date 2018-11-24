@@ -59,6 +59,13 @@ namespace WebApplication1.Controllers
             {
                 _context.Task.Add(task);
                 _context.SaveChanges();
+                UserTasks ut = new UserTasks
+                {
+                    Task = _context.Task.Find(task.Id),
+                    User = _context.User.Find(long.Parse(User.Identity.Name))
+                };
+                _context.UserTasks.Add(ut);
+                _context.SaveChanges();
                 return Ok();
             }
             catch (ApplicationException ex)
