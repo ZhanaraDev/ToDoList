@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +26,28 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public string Get()
         {
-            return JsonConvert.SerializeObject(_context.Task.ToList(),
+            long CurretUserId = long.Parse(User.Identity.Name);
+            
+            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).ToList();
+
+            return JsonConvert.SerializeObject(tasks,
+            new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            });
+        }
+
+        [HttpGet]
+        [Route("category/{cat_id:int}")]
+        public string GetByCategory(int cat_id)
+        {
+            Trace.WriteLine("Here we go");
+            Trace.WriteLine(cat_id);
+            long CurrentUserId = long.Parse(User.Identity.Name);
+            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurrentUserId) && 
+                        t.TaskCategory.TaskCategoryID == (long)cat_id).ToList();
+            Trace.WriteLine(tasks);
+            return JsonConvert.SerializeObject(tasks,
             new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

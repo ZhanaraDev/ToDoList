@@ -24,10 +24,8 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public string Get()
         {
-            System.Diagnostics.Trace.WriteLine("GET ALL");
-            System.Diagnostics.Trace.WriteLine(_context.TaskCategory.ToList());
-            System.Diagnostics.Trace.WriteLine("GET ALL-DONE");
-            return JsonConvert.SerializeObject(_context.TaskCategory.ToList(),
+            var categories = _context.TaskCategory.Where(c => c.User.Id == long.Parse(User.Identity.Name)).ToList();
+            return JsonConvert.SerializeObject(categories,
             new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
