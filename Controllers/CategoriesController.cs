@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WebApplication1.dto;
 using WebApplication1.Models;
+using Task = WebApplication1.Models.Task;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -73,6 +74,13 @@ namespace WebApplication1.Controllers
         public void Delete(int id)
         {
             TaskCategory cat = new TaskCategory { TaskCategoryID = id };
+
+            var tasks = _context.Task.Where(t => t.TaskCategory.TaskCategoryID.Equals(id)).ToList();
+            foreach (Task task in tasks)
+            {
+                _context.Task.Attach(task);
+                _context.Task.Remove(task);
+            }
             _context.TaskCategory.Attach(cat);
             _context.TaskCategory.Remove(cat);
             _context.SaveChanges();

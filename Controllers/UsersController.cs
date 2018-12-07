@@ -14,6 +14,7 @@ using WebApplication1.dto;
 using WebApplication1.Helpers;
 using WebApplication1.Models;
 using WebApplication1.services;
+using Task = WebApplication1.Models.Task;
 
 namespace WebApplication1.Controllers
 {
@@ -24,6 +25,8 @@ namespace WebApplication1.Controllers
         private IUserService _userService;
         private IUserProfileService _userProfileService;
         private readonly AppSettings _appSettings;
+        private DataContext _context;
+
         public UsersController(IUserService userService, IUserProfileService userProfileService, IOptions<AppSettings> appSettings)
         {
             _userService = userService;
@@ -105,6 +108,25 @@ namespace WebApplication1.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+           var categories = _context.TaskCategory.Where(tc => tc.User.Id.Equals(id)).ToList();
+            foreach (TaskCategory cat in categories)
+            {
+                var tasks = _context.Task.Where(t => t.TaskCategory.TaskCategoryID.Equals(cat.TaskCategoryID)).ToList();
+                foreach (Task task in tasks)
+                {
+                    _context.Task.Attach(task);
+                    _context.Task.Remove(task);
+                }
+                _context.TaskCategory.Attach(cat);
+                _context.TaskCategory.Remove(cat);
+                _context.SaveChanges();
+            }
+
+            UserProfile userProfile = _context.UserProfile.Where(up => up.User.Id.Equals(id)).First();
+            _context.UserProfile.Remove(userProfile);
+            User user = _context.User.Where(u => u.Id.Equals(id)).First();
+            _context.User.Remove(user);
+            _context.SaveChanges();
         }
     }
 }
