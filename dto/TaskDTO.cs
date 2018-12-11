@@ -7,8 +7,8 @@ namespace WebApplication1.dto
 {
     public class TaskDTO
     {
-        public String TaskName { get; set; }
-        public String TaskDesription { get; set; }
+        public String Name { get; set; }
+        public String Desription { get; set; }
         public long CategoryID { get; set; }
         public DateTime DateAdded { get; set; }
         public DateTime Deadline { get; set; }

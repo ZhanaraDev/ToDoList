@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using WebApplication1.dto;
 using WebApplication1.Helpers;
 using WebApplication1.Models;
@@ -27,26 +28,34 @@ namespace WebApplication1.Controllers
         private readonly AppSettings _appSettings;
         private DataContext _context;
 
-        public UsersController(IUserService userService, IUserProfileService userProfileService, IOptions<AppSettings> appSettings)
+        public UsersController(IUserService userService, IUserProfileService userProfileService, IOptions<AppSettings> appSettings, DataContext context)
         {
             _userService = userService;
             _userProfileService = userProfileService;
             _appSettings = appSettings.Value;
+            _context = context;
         }
         
 
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            var users = _context.User.ToList();
+            return JsonConvert.SerializeObject(users,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                });
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
-            return "value";
+           User user = _context.User.Where(us => us.Id.Equals(id)).First();
+            
+            return JsonConvert.SerializeObject(user);
         }
 
         // POST api/values
@@ -98,12 +107,7 @@ namespace WebApplication1.Controllers
             return Ok(new {Token=tokenString});
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
+     
         // DELETE api/values/5
         [HttpDelete("{id}")]
         public void Delete(int id)

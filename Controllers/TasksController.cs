@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -69,8 +68,8 @@ namespace WebApplication1.Controllers
             System.Diagnostics.Trace.WriteLine("CREATE TASK");
             System.Diagnostics.Trace.WriteLine(_task.isImportant);
             Models.Task task = new Models.Task {
-                TaskName = _task.TaskName,
-                TaskDesription = _task.TaskDesription,
+                TaskName = _task.Name,
+                TaskDesription = _task.Desription,
                 TaskCategory = _context.TaskCategory.Find(_task.CategoryID),
                 DateAdded = DateTime.Now,
                 isImportant = _task.isImportant,
@@ -98,8 +97,34 @@ namespace WebApplication1.Controllers
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public ActionResult<string> Put(int id, [FromBody]TaskDTO dto)
         {
+           Task task = _context.Task.Where(t => t.Id.Equals(id)).First();
+            bool hasChanges = false;
+            
+            if (dto.Name != null)
+            {
+                task.TaskName = dto.Name;
+                hasChanges = true;
+            }
+
+            if (dto.Desription != null)
+            {
+                task.TaskDesription = dto.Desription;
+                hasChanges = true;
+            }
+
+            if (hasChanges)
+            {
+                _context.Task.Update(task);
+                _context.SaveChanges();
+            }
+            
+            return JsonConvert.SerializeObject(task, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            });
+            
         }
 
         // DELETE api/<controller>/5

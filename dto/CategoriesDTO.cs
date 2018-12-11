@@ -7,7 +7,8 @@ namespace WebApplication1.dto
 {
     public class CategoriesDTO
     {
-        public String CategoryName { get; set; }
+        public long Id { get; set; }
+        public String Name { get; set; }
         public String Description { get; set; }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using WebApplication1.dto;
 using WebApplication1.Models;
@@ -12,15 +14,18 @@ using Task = WebApplication1.Models.Task;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebApplication1.Controllers
-{   [Authorize]
+{ 
+    [Authorize]
     [Route("api/[controller]")]
     public class CategoriesController : Controller
     {
+        
         private DataContext _context;
         public CategoriesController(DataContext context)
         {
             _context = context;
         }
+        
         // GET: api/<controller>
         [HttpGet]
         public string Get()
@@ -38,7 +43,11 @@ namespace WebApplication1.Controllers
         public string Get(int id)
         {
             TaskCategory cat = _context.TaskCategory.Find((long)id);
-            return JsonConvert.SerializeObject(cat);
+            return JsonConvert.SerializeObject(cat,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                });
         }
 
         // POST api/<controller>
@@ -46,13 +55,12 @@ namespace WebApplication1.Controllers
         public IActionResult Post([FromBody]CategoriesDTO cat)
         {
             TaskCategory tc = new TaskCategory {
-                CategoryName = cat.CategoryName,
+                CategoryName = cat.Name,
                 Description = cat.Description,
                 User = _context.User.Find(long.Parse(User.Identity.Name))
             };
             try
             {
-                System.Diagnostics.Trace.WriteLine("CREATE CATEGORY");
                 _context.TaskCategory.Add(tc);
                 _context.SaveChanges();
                 return Ok();
@@ -64,18 +72,42 @@ namespace WebApplication1.Controllers
         }
 
         // PUT api/<controller>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        [HttpPut]
+        public ActionResult<string> Put([FromBody]CategoriesDTO dto)
         {
+           TaskCategory category = _context.TaskCategory.Where(tc => tc.TaskCategoryID.Equals(dto.Id)).First();
+            
+            bool hasChanges = false;
+
+            if (dto.Name != null)
+            {
+                category.CategoryName = dto.Name;
+                hasChanges = true;
+            }
+            
+            if (dto.Description != null)
+            {
+                category.Description = dto.Description;
+                hasChanges = true;
+            }
+            if (hasChanges)
+            {
+                _context.TaskCategory.Update(category);
+                _context.SaveChanges();
+            }
+            
+            return JsonConvert.SerializeObject(category, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            });
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete([BindRequired]long id)
         {
-            TaskCategory cat = new TaskCategory { TaskCategoryID = id };
-
-            var tasks = _context.Task.Where(t => t.TaskCategory.TaskCategoryID.Equals(id)).ToList();
+            TaskCategory cat = _context.TaskCategory.Find((long)id);
+            var tasks = _context.Task.Where(t => t.TaskCategory.Equals(cat)).ToList();
             foreach (Task task in tasks)
             {
                 _context.Task.Attach(task);
