@@ -34,7 +34,7 @@ namespace WebApplication1.Controllers
         [HttpPut]
         public ActionResult<string> Put([FromBody] UserProfileDTO dto)
         {
-            UserProfile userProfile = _context.UserProfile.Where(up => up.Id == dto.Id).First();
+            UserProfile userProfile = _context.UserProfile.Where(up => up.User.Id == long.Parse(User.Identity.Name)).First();
           
             bool hasChanges = false;
             if (dto.Name != null)
