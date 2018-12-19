@@ -107,15 +107,19 @@ namespace WebApplication1.Controllers
         public void Delete([BindRequired]long id)
         {
             TaskCategory cat = _context.TaskCategory.Find((long)id);
-            var tasks = _context.Task.Where(t => t.TaskCategory.Equals(cat)).ToList();
-            foreach (Task task in tasks)
+            if (!cat.CategoryName.Equals("Default") && cat.User.Id.Equals(long.Parse(User.Identity.Name)))
             {
-                _context.Task.Attach(task);
-                _context.Task.Remove(task);
+                var tasks = _context.Task.Where(t => t.Category.Equals(cat)).ToList();
+                foreach (Task task in tasks)
+                {
+                    _context.Task.Attach(task);
+                    _context.Task.Remove(task);
+                }
+                _context.TaskCategory.Attach(cat);
+                _context.TaskCategory.Remove(cat);
+               _context.SaveChanges();      
             }
-            _context.TaskCategory.Attach(cat);
-            _context.TaskCategory.Remove(cat);
-            _context.SaveChanges();
+         
         }
     }
 }

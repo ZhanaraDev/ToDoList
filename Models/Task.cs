@@ -9,14 +9,13 @@ namespace WebApplication1.Models
     public class Task
     {
         public long Id { get; set; }
-        public String TaskName { get; set; }
-        public String TaskDesription { get; set; }
-        public virtual TaskCategory TaskCategory { get; set; }
-        public DateTime DateAdded { get; set; }
-        public DateTime? Deadline { get; set; }
-        public bool isImportant { get; set; }
+        public String Name { get; set; }
+        public String Description { get; set; }
+        public virtual TaskCategory Category { get; set; }
+        public long CreatedAt { get; set; }
+        public long ExpiredAt { get; set; }
+        public bool isDone { get; set; }
         public virtual ICollection<UserTasks> UserTasks { get; set; }
-
 
     }
 }

@@ -32,7 +32,7 @@ namespace WebApplication1.Models
             .WithMany(c => c.TaskCategories);
 
             modelBuilder.Entity<Task>()
-            .HasOne(e => e.TaskCategory)
+            .HasOne(e => e.Category)
             .WithMany(c => c.Tasks);
 
             modelBuilder.Entity<UserTasks>()

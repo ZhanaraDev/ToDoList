@@ -63,16 +63,24 @@ namespace WebApplication1.Controllers
         [Route("register")]
         public IActionResult Register([FromBody] RegistrationReq req)
         {
-            Trace.WriteLine("hey",req.UserName);
             User u = new User{ UserName=req.UserName, Password=req.Password};
             Trace.WriteLine(u.Password,u.UserName);
           
             try
             {
-                _userService.Create(u, req.Password);
+                User user = _userService.Create(u, req.Password);
                 UserProfile up = new UserProfile { User = u,Role=1 };//cuz its ordinary user
                 _userProfileService.Create(up);
 
+                //here we need to create a default task category
+                TaskCategory tc = new TaskCategory {
+                    CategoryName = "Default",
+                    Description = "This category is default",
+                    User = user
+                };
+                _context.TaskCategory.Add(tc);
+                _context.SaveChanges();
+               
                 return Ok();
             }
             catch(ApplicationException ex)
@@ -115,7 +123,7 @@ namespace WebApplication1.Controllers
            var categories = _context.TaskCategory.Where(tc => tc.User.Id.Equals(id)).ToList();
             foreach (TaskCategory cat in categories)
             {
-                var tasks = _context.Task.Where(t => t.TaskCategory.TaskCategoryID.Equals(cat.TaskCategoryID)).ToList();
+                var tasks = _context.Task.Where(t => t.Category.TaskCategoryID.Equals(cat.TaskCategoryID)).ToList();
                 foreach (Task task in tasks)
                 {
                     _context.Task.Attach(task);

@@ -7,11 +7,13 @@ namespace WebApplication1.dto
 {
     public class TaskDTO
     {
+        public long Id { get; set; }
         public String Name { get; set; }
-        public String Desription { get; set; }
+        public String Description { get; set; }
         public long CategoryID { get; set; }
-        public DateTime DateAdded { get; set; }
-        public DateTime Deadline { get; set; }
-        public bool isImportant { get; set; }
+        public long CreatedAt { get; set; }
+        public bool isDone { get; set; }
+        public long ExpiredAt { get; set; }
+        public long UserId { get; set; }
     }
 }

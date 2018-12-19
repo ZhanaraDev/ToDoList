@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
@@ -32,24 +31,53 @@ namespace WebApplication1.Controllers
             return JsonConvert.SerializeObject(tasks,
             new JsonSerializerSettings()
             {
-                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
+        }
+        
+        [HttpGet]
+        [Route("current")]
+        public string GetNotFinished()
+        {
+            long CurretUserId = long.Parse(User.Identity.Name);
+            
+            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).Where(t => t.isDone.Equals(false)).ToList();
+
+            return JsonConvert.SerializeObject(tasks,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+        }
+        
+        [HttpGet]
+        [Route("finished")]
+        public string GetFinished()
+        {
+            long CurretUserId = long.Parse(User.Identity.Name);
+            
+            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).Where(t => t.isDone.Equals(true)).ToList();
+
+            return JsonConvert.SerializeObject(tasks,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
         }
 
         [HttpGet]
         [Route("category/{cat_id:int}")]
         public string GetByCategory(int cat_id)
         {
-            Trace.WriteLine("Here we go");
-            Trace.WriteLine(cat_id);
+         
             long CurrentUserId = long.Parse(User.Identity.Name);
             var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurrentUserId) && 
-                        t.TaskCategory.TaskCategoryID == (long)cat_id).ToList();
+                        t.Category.TaskCategoryID == (long)cat_id).ToList();
             Trace.WriteLine(tasks);
             return JsonConvert.SerializeObject(tasks,
             new JsonSerializerSettings()
             {
-                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
         }
 
@@ -57,7 +85,7 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            Models.Task task = _context.Task.Find((long)id);
+            Task task = _context.Task.Find((long)id);
             return JsonConvert.SerializeObject(task); 
         }
 
@@ -65,17 +93,18 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]TaskDTO _task)
         {
-            System.Diagnostics.Trace.WriteLine("CREATE TASK");
-            System.Diagnostics.Trace.WriteLine(_task.isImportant);
-            Models.Task task = new Models.Task {
-                TaskName = _task.Name,
-                TaskDesription = _task.Desription,
-                TaskCategory = _context.TaskCategory.Find(_task.CategoryID),
-                DateAdded = DateTime.Now,
-                isImportant = _task.isImportant,
-                Deadline = _task.Deadline
+            Task task = new Task {
+                Name = _task.Name,
+                Description = _task.Description,
+                Category = _context.TaskCategory.Find(_task.CategoryID),
+                CreatedAt = _task.CreatedAt
             };
 
+            if (_task.ExpiredAt != null)
+            {
+                task.ExpiredAt = _task.ExpiredAt;
+            }
+            
             try
             {
                 _context.Task.Add(task);
@@ -104,13 +133,13 @@ namespace WebApplication1.Controllers
             
             if (dto.Name != null)
             {
-                task.TaskName = dto.Name;
+                task.Name = dto.Name;
                 hasChanges = true;
             }
 
-            if (dto.Desription != null)
+            if (dto.Description != null)
             {
-                task.TaskDesription = dto.Desription;
+                task.Description = dto.Description;
                 hasChanges = true;
             }
 
@@ -122,7 +151,7 @@ namespace WebApplication1.Controllers
             
             return JsonConvert.SerializeObject(task, new JsonSerializerSettings()
             {
-                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
             
         }
@@ -131,7 +160,7 @@ namespace WebApplication1.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            Models.Task task = new Models.Task { Id = id };
+            Task task = new Task { Id = id };
             _context.Task.Attach(task);
             _context.Task.Remove(task);
             _context.SaveChanges();
