@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WebApplication1.dto;
 using WebApplication1.Models;
@@ -26,7 +29,7 @@ namespace WebApplication1.Controllers
         {
             long CurretUserId = long.Parse(User.Identity.Name);
             
-            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).ToList();
+            var tasks = _context.Task.Include(taskL => taskL.Category).Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).ToList();
 
             return JsonConvert.SerializeObject(tasks,
             new JsonSerializerSettings()
@@ -41,9 +44,29 @@ namespace WebApplication1.Controllers
         {
             long CurretUserId = long.Parse(User.Identity.Name);
             
-            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).Where(t => t.isDone.Equals(false)).ToList();
+            var tasks = _context.Task.Include(taskL => taskL.Category).Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).Where(t => t.isDone.Equals(false)).ToList();
 
-            return JsonConvert.SerializeObject(tasks,
+            ArrayList taskDTOs = new ArrayList();
+            
+            tasks.ForEach(task =>
+            {
+                TaskDTO taskDto = new TaskDTO();
+                taskDto.Id = task.Id;
+                taskDto.Name = task.Name;
+                taskDto.Description = task.Description;
+                if (task.Category != null)
+                {
+                    taskDto.CategoryID = task.Category.TaskCategoryID;
+
+                }
+                taskDto.CreatedAt = task.CreatedAt;
+                taskDto.ExpiredAt = task.ExpiredAt;
+                taskDto.isDone = task.isDone;
+                taskDto.UserId = CurretUserId;
+                taskDTOs.Add(taskDto);
+            });
+            
+            return JsonConvert.SerializeObject(taskDTOs,
                 new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -56,9 +79,29 @@ namespace WebApplication1.Controllers
         {
             long CurretUserId = long.Parse(User.Identity.Name);
             
-            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).Where(t => t.isDone.Equals(true)).ToList();
+            var tasks = _context.Task.Include(taskL => taskL.Category).Where(t => t.UserTasks.Any(ut => ut.UserId == CurretUserId)).Where(t => t.isDone.Equals(true)).ToList();
 
-            return JsonConvert.SerializeObject(tasks,
+            ArrayList taskDTOs = new ArrayList();
+            
+            tasks.ForEach(task =>
+            {
+                TaskDTO taskDto = new TaskDTO();
+                taskDto.Id = task.Id;
+                taskDto.Name = task.Name;
+                taskDto.Description = task.Description;
+                if (task.Category != null)
+                {
+                    taskDto.CategoryID = task.Category.TaskCategoryID;
+
+                }
+                taskDto.CreatedAt = task.CreatedAt;
+                taskDto.ExpiredAt = task.ExpiredAt;
+                taskDto.isDone = task.isDone;
+                taskDto.UserId = CurretUserId;
+                taskDTOs.Add(taskDto);
+            });
+            
+            return JsonConvert.SerializeObject(taskDTOs,
                 new JsonSerializerSettings()
                 {
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -70,11 +113,33 @@ namespace WebApplication1.Controllers
         public string GetByCategory(int cat_id)
         {
          
+            long CurretUserId = long.Parse(User.Identity.Name);
+
             long CurrentUserId = long.Parse(User.Identity.Name);
-            var tasks = _context.Task.Where(t => t.UserTasks.Any(ut => ut.UserId == CurrentUserId) && 
+            var tasks = _context.Task.Include(taskL => taskL.Category).Where(t => t.UserTasks.Any(ut => ut.UserId == CurrentUserId) && 
                         t.Category.TaskCategoryID == (long)cat_id).ToList();
-            Trace.WriteLine(tasks);
-            return JsonConvert.SerializeObject(tasks,
+            
+            ArrayList taskDTOs = new ArrayList();
+            
+            tasks.ForEach(task =>
+            {
+                TaskDTO taskDto = new TaskDTO();
+                taskDto.Id = task.Id;
+                taskDto.Name = task.Name;
+                taskDto.Description = task.Description;
+                if (task.Category != null)
+                {
+                    taskDto.CategoryID = task.Category.TaskCategoryID;
+
+                }
+                taskDto.CreatedAt = task.CreatedAt;
+                taskDto.ExpiredAt = task.ExpiredAt;
+                taskDto.isDone = task.isDone;
+                taskDto.UserId = CurretUserId;
+                taskDTOs.Add(taskDto);
+            });
+            
+            return JsonConvert.SerializeObject(taskDTOs,
             new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -85,8 +150,25 @@ namespace WebApplication1.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            Task task = _context.Task.Find((long)id);
-            return JsonConvert.SerializeObject(task); 
+            Task task = _context.Task.Include(taskL => taskL.Category).Where(taskL => taskL.Id.Equals((long)id)).First();
+            
+            long CurretUserId = long.Parse(User.Identity.Name);
+
+            TaskDTO taskDto = new TaskDTO();
+            taskDto.Id = task.Id;
+            taskDto.Name = task.Name;
+            taskDto.Description = task.Description;
+            if (task.Category != null)
+            {
+                taskDto.CategoryID = task.Category.TaskCategoryID;
+
+            }
+            taskDto.CreatedAt = task.CreatedAt;
+            taskDto.ExpiredAt = task.ExpiredAt;
+            taskDto.isDone = task.isDone;
+            taskDto.UserId = CurretUserId;
+            
+            return JsonConvert.SerializeObject(taskDto); 
         }
 
         // POST api/<controller>
@@ -141,6 +223,23 @@ namespace WebApplication1.Controllers
             {
                 task.Description = dto.Description;
                 hasChanges = true;
+            }
+
+            if (dto.ExpiredAt != null)
+            {
+                task.ExpiredAt = dto.ExpiredAt;
+                hasChanges = true;
+            }
+
+            if (dto.CategoryID != null)
+            {
+                TaskCategory category = _context.TaskCategory.Find(dto.CategoryID);
+                task.Category = category;
+            }
+
+            if (dto.isDone != null)
+            {
+                task.isDone = dto.isDone;
             }
 
             if (hasChanges)
